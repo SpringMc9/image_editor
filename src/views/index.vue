@@ -19,7 +19,7 @@
           </router-link>
         </el-aside>
         <el-main class="main">
-          <router-view></router-view>
+          <router-view> </router-view>
         </el-main>
       </el-container>
     </el-container>
@@ -32,32 +32,29 @@ import { reactive, toRefs } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 export default {
-  name: 'HomeView',
+  name: "HomeView",
   props: [""],
-  components: {
-  },
+  components: {},
   setup() {
     // 变量定义
-    const router = useRouter()
+    const router = useRouter();
     const store = useStore();
-    const state = reactive({
-
-    })
+    const state = reactive({});
 
     // 挂载前
-    onBeforeMount(() => { });
+    onBeforeMount(() => {});
     // 挂载后
-    onMounted(() => { });
+    onMounted(() => {});
     // 更新后
-    onUpdated(() => { });
+    onUpdated(() => {});
 
     return {
       ...toRefs(state),
       store,
       router,
-    }
-  }
-}
+    };
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -93,7 +90,8 @@ export default {
           width: 26%;
         }
 
-        .span {}
+        .span {
+        }
       }
     }
 
@@ -122,7 +120,7 @@ export default {
           justify-content: center;
           align-items: center;
           margin-top: 15px;
-          background-color: #F8FAFB;
+          background-color: #f8fafb;
           border-radius: 10px;
 
           .logo {
@@ -131,7 +129,7 @@ export default {
         }
 
         .aside-box-options:hover {
-          background-color: #ECF3FF;
+          background-color: #ecf3ff;
           /* 鼠标悬停时的背景色 */
         }
       }
@@ -144,4 +142,5 @@ export default {
       }
     }
   }
-}</style>
+}
+</style>
