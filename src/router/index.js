@@ -1,12 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/index.vue'
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
-  }
+    component: () => import("../views/index.vue"),
+    children: [
+      {
+        path: '/Adjust',
+        name: 'AdjustImage',
+        component: () => import("../views/Adjust.vue"),
+      },
+      {
+        path: '/Watermark',
+        name: 'WatermarkImage',
+        component: () => import("../views/Watermark.vue"),
+      }
+    ]
+  },
+  
 ]
 
 const router = createRouter({

@@ -1,7 +1,5 @@
 <template>
-  <div class="main-box">
-
-  </div>
+  <p>xxxx</p>
 </template>
 
 <script>
@@ -10,9 +8,10 @@ import { reactive, toRefs } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 export default {
-  name: 'MainView',
+  name: 'HomeView',
   props: [""],
-  components: {},
+  components: {
+  },
   setup() {
     // 变量定义
     const router = useRouter()
@@ -22,11 +21,11 @@ export default {
     })
 
     // 挂载前
-    onBeforeMount(() => { });
+    onBeforeMount(() => {});
     // 挂载后
-    onMounted(() => { });
+    onMounted(() => {});
     // 更新后
-    onUpdated(() => { });
+    onUpdated(() => {});
 
     return {
       ...toRefs(state),
@@ -38,5 +37,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 </style>
