@@ -13,9 +13,9 @@
             <img class="logo" src="../assets/images/wpsLogo.png" />
             <span>Adjust</span>
           </router-link>
-          <router-link to="/Watermark" class="aside-box-options">
+          <router-link to="/Text" class="aside-box-options">
             <img class="logo" src="../assets/images/wpsLogo.png" />
-            <span>Watermark</span>
+            <span>Text</span>
           </router-link>
         </el-aside>
         <el-main class="main">

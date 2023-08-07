@@ -1,14 +1,15 @@
-import { createStore } from 'vuex'
+import { createStore } from "vuex";
 
 export default createStore({
   state: {
+    imageData: null,
   },
-  getters: {
-  },
+  getters: {},
   mutations: {
+    setUploadedImage(state, image) {
+      state.imageData = image;
+    },
   },
-  actions: {
-  },
-  modules: {
-  }
-})
+  actions: {},
+  modules: {},
+});

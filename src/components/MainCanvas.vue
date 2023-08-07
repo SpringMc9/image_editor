@@ -6,7 +6,7 @@
     @drop="handleDrop"
     @click="uploadImage"
   >
-    <div v-if="!imageData" class="upload">
+    <div v-if="!store.state.imageData" class="upload">
       <el-icon size="25"><Plus/></el-icon>
       <p>拖拽图片到此处或上传图片</p>
       <div id="upload_area_btn" class="btn" @click.stop="uploadImage">
@@ -14,20 +14,22 @@
         <span> Open Image </span>
       </div>
     </div>
-    <img v-else="imageData" :src="imageData" />
+    <img v-else="store.state.imageData" :src="store.state.imageData" />
   </div>
 </template>
 
 <script>
 import { reactive, toRefs } from "@vue/reactivity";
+import { useStore } from "vuex";
+import { message } from "ant-design-vue";
 
 export default {
   name: "MainCanvas",
   components: {},
   setup() {
+    const store = useStore();
     const state = reactive({
       fileSelected: false,
-      imageData: null,
     });
 
     const handleDrop = (event) => {
@@ -37,19 +39,19 @@ export default {
       if (file && file.type.startsWith("image/")) {
         readFile(file);
       } else {
-        // Message.error("请拖拽一张图片文件到此处")
+        message.error("请拖拽一张图片文件到此处")
       }
     };
     const readFile = (file) => {
       const reader = new FileReader();
       reader.onload = () => {
-        state.imageData = reader.result;
+        store.commit('setUploadedImage', reader.result);
       };
       reader.readAsDataURL(file);
     };
 
     const uploadImage = () => {
-      if (state.imageData) return;
+      if (store.state.imageData) return;
       state.fileSelected = false;
       const fileInput = document.createElement("input");
       fileInput.type = "file";
@@ -65,7 +67,7 @@ export default {
         const reader = new FileReader();
         reader.onload = (event) => {
           const content = event.target.result;
-          state.imageData = content;
+          store.commit('setUploadedImage', content);
         };
         reader.readAsDataURL(selectedFile);
         state.fileSelected = true;
@@ -74,6 +76,7 @@ export default {
 
     return {
       ...toRefs(state),
+      store,
       handleDrop,
       uploadImage,
     };

@@ -17,9 +17,9 @@ const routes = [
         component: () => import("../views/Adjust.vue"),
       },
       {
-        path: "/Watermark",
-        name: "WatermarkImage",
-        component: () => import("../views/Watermark.vue"),
+        path: "/Text",
+        name: "TextEditor",
+        component: () => import("../components/TextEditor.vue"),
       },
     ],
   },
