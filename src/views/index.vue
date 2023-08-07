@@ -6,6 +6,10 @@
           <img class="logo" src="../assets/images/wpsLogo.png" />
           <span>Image Editor</span>
         </div>
+        <div class="imageUpload">
+          <el-button type="primary" round>打开本地图片</el-button>
+          <el-button type="primary" round>保存图片</el-button>
+        </div>
       </el-header>
       <el-container class="aside-main">
         <el-aside class="aside">
@@ -81,28 +85,35 @@ export default {
 
     .header {
       height: 50px;
-      border: 1px solid blue;
+      // border: 2px solid #bde9f0;
+      border-radius: 10px;
       display: flex;
       flex-wrap: wrap;
       align-content: center;
+      // background-color: #bde9f0;
 
       .header-left {
-        width: 13%;
-
+        width: 80%;
+        display: flex;
+        align-items: center;
         .logo {
-          width: 26%;
+          width: 50px;
         }
-
-        .span {}
+        .span {
+          text-decoration: none;
+        }
+      }
+      .imageUpload{
+        flex: 1;
+        display: flex;
+        align-items: center;
       }
     }
 
     .aside-main {
       width: 100%;
       height: 90vh;
-      /* 设置高度为视口高度 */
       display: flex;
-      /* 使用 Flex 布局 */
       flex-direction: initial;
       position: relative;
 
@@ -122,8 +133,9 @@ export default {
           justify-content: center;
           align-items: center;
           margin-top: 15px;
-          background-color: #F8FAFB;
           border-radius: 10px;
+          text-decoration: none;
+          background-color:#f3f6f7;
 
           .logo {
             width: 55%;
@@ -132,13 +144,11 @@ export default {
 
         .aside-box-options:hover {
           background-color: #ECF3FF;
-          /* 鼠标悬停时的背景色 */
         }
       }
 
       .main {
         flex: 1;
-        /* 使用 Flex 自适应布局，使 Main 部分占据剩余空间 */
         border: 1px solid rgb(231, 21, 175);
         float: right;
       }
