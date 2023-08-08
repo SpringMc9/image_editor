@@ -2,12 +2,12 @@
   <div class="area">
     <canvas id="canvas" v-if="store.state.imageData" class="image"></canvas>
     <p v-else>请上传图片</p>
-    <button @click="addText">添加文字</button>
+    <!-- <button @click="addText">添加文字</button> -->
   </div>
 </template>
 
 <script>
-import { onMounted } from "@vue/runtime-core";
+import { onMounted, onBeforeUnmount } from "@vue/runtime-core";
 import { reactive, toRefs } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { fabric } from "fabric";
@@ -17,40 +17,67 @@ export default {
   components: {},
   setup() {
     const store = useStore();
-    const state = reactive({});
+    const state = reactive({
+      canvas: null,
+      imageObject: null,
+    });
 
     const loadCanvas = () => {
-      if (store.state.imageData) {
-        const canvas = new fabric.Canvas('canvas');
-        const ctx = canvas.getContext('2d');
+      if (store.state.imageData && !state.imageObject) {
         const image = new Image();
         image.src = store.state.imageData;
         image.onload = () => {
-          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-          // 在这里你可以使用绘图上下文API来绘制其他图形或添加艺术文字
+          state.imageObject = new fabric.Image(image, {
+            left: 0,
+            top: 0,
+            selectable: false,
+          });
+          state.canvas.add(state.imageObject);
         };
       }
-    }
+    };
     const addText = () => {
-      const text = new fabric.IText("在这里添加文字", {
-        left: 100,
-        top: 100,
-        fill: "black",
-        fontFamily: "Arial",
-        fontSize: 20,
-      });
-      this.canvas.add(text);
-      this.canvas.setActiveObject(text);
-      this.canvas.renderAll();
-    }
+      if (state.imageObject) {
+        const text = new fabric.IText("在这里添加文字", {
+          left: 100,
+          top: 100,
+          fill: "black",
+          fontFamily: "Arial",
+          fontSize: 20,
+          selectable: true, // 设置文字可选中和编辑
+        });
+        state.canvas.add(text);
+        state.canvas.setActiveObject(text);
+        state.canvas.renderAll();
+      }
+    };
+
+    const updateCanvasSize = () => {
+      const canvasElement = document.getElementById('canvas');
+      const divElement = document.querySelector(".area");
+      canvasElement.width = divElement.clientWidth;
+      canvasElement.height = divElement.clientHeight;
+    };
 
     onMounted(() => {
-      loadCanvas()
+      const divElement = document.querySelector(".area");
+      state.canvas = new fabric.Canvas("canvas", {
+        // width: divElement.clientWidth, // 画布宽度
+        // height: divElement.clientHeight, // 画布高度度
+      });
+      window.addEventListener('resize', updateCanvasSize);
+      updateCanvasSize()
+      loadCanvas();
+    });
+
+     onBeforeUnmount(() => {
+      window.removeEventListener('resize', updateCanvasSize);
     });
 
     return {
       ...toRefs(state),
       store,
+      addText,
     };
   },
 };
@@ -81,10 +108,9 @@ export default {
     margin-top: 22px;
     position: relative;
   }
-}
 
-.image {
-  max-width: 100%;
-  max-height: 100%;
+  canvas {
+        display: block;
+      }
 }
 </style>
