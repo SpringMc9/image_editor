@@ -1,48 +1,63 @@
 <template>
-    <div
-      class="drop-area"
-      @dragenter.prevent
-      @dragover.prevent
-      @drop="handleDrop"
-      @click="uploadImage"
-    >
-      <div v-if="!store.state.imageData" class="upload">
-        <el-icon size="25"><Plus/></el-icon>
-        <p>拖拽图片到此处或上传图片</p>
-        <div id="upload_area_btn" class="btn" @click.stop="uploadImage">
-          <div class="bmg"></div>
-          <span> Open Image </span>
-        </div>
-      </div>
-      <img v-else="store.state.imageData" :src="store.state.imageData" />
-    </div>
+  <div class="area">
+    <canvas id="canvas" v-if="store.state.imageData" class="image"></canvas>
+    <p v-else>请上传图片</p>
+    <button @click="addText">添加文字</button>
+  </div>
 </template>
 
 <script>
+import { onMounted } from "@vue/runtime-core";
 import { reactive, toRefs } from "@vue/reactivity";
 import { useStore } from "vuex";
+import { fabric } from "fabric";
 
 export default {
-  name: 'TextEditor',
-  components: {
-  },
+  name: "TextEditor",
+  components: {},
   setup() {
     const store = useStore();
-    const state = reactive({
+    const state = reactive({});
 
-    })
+    const loadCanvas = () => {
+      if (store.state.imageData) {
+        const canvas = new fabric.Canvas('canvas');
+        const ctx = canvas.getContext('2d');
+        const image = new Image();
+        image.src = store.state.imageData;
+        image.onload = () => {
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+          // 在这里你可以使用绘图上下文API来绘制其他图形或添加艺术文字
+        };
+      }
+    }
+    const addText = () => {
+      const text = new fabric.IText("在这里添加文字", {
+        left: 100,
+        top: 100,
+        fill: "black",
+        fontFamily: "Arial",
+        fontSize: 20,
+      });
+      this.canvas.add(text);
+      this.canvas.setActiveObject(text);
+      this.canvas.renderAll();
+    }
 
+    onMounted(() => {
+      loadCanvas()
+    });
 
     return {
       ...toRefs(state),
       store,
-    }
-  }
-}
+    };
+  },
+};
 </script>
 
 <style lang="scss">
-.drop-area {
+.area {
   position: relative;
   box-sizing: border-box;
   width: 100%;
@@ -56,80 +71,20 @@ export default {
   align-items: center;
   cursor: pointer;
 
-  .upload {
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    flex-direction: column;
-    -webkit-box-pack: start;
-    justify-content: flex-start;
-    -webkit-box-align: center;
-    align-items: center;
-    line-height: 20px;
-    font-size: 13px;
-    color: #2c7dfa;
-
-    p {
-      display: block;
-      text-align: center;
-      font-size: 16px;
-      font-weight: 600;
-      color: #1e1f22;
-      line-height: 18px;
-      margin-top: 22px;
-      position: relative;
-    }
-
-    .btn {
-      margin-top: 23px;
-      width: 200px;
-      height: 40px;
-      border-radius: 4px;
-      position: relative;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 400;
-      color: #fff;
-      line-height: 24px;
-      overflow: hidden;
-
-      .bmg {
-        display: inline-block;
-        content: "";
-        width: 500%;
-        height: 100%;
-        background: linear-gradient(130deg,
-            #2c7dfa,
-            #1559f7 20%,
-            #2c7dfa 40%,
-            #1559f7 60%,
-            #2c7dfa 80%,
-            #1559f7);
-        transform: translateX(0);
-      }
-
-      span {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        justify-content: space-around;
-        -webkit-box-align: center;
-        align-items: center;
-      }
-    }
-  }
-
-  img {
-    max-width: 100%;
-    max-height: 100%;
+  p {
+    display: block;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e1f22;
+    line-height: 18px;
+    margin-top: 22px;
+    position: relative;
   }
 }
 
-.drop-area:hover {
-  background: #f7faff;
-  border-color: #2c7dfa;
+.image {
+  max-width: 100%;
+  max-height: 100%;
 }
 </style>

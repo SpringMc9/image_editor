@@ -14,7 +14,7 @@
         <span> Open Image </span>
       </div>
     </div>
-    <img v-else="store.state.imageData" :src="store.state.imageData" />
+    <img v-else :src="store.state.imageData" class="image"/>
   </div>
 </template>
 
@@ -167,7 +167,7 @@ export default {
     }
   }
 
-  img {
+  .image {
     max-width: 100%;
     max-height: 100%;
   }
