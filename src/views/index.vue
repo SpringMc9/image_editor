@@ -14,11 +14,11 @@
       <el-container class="aside-main">
         <el-aside class="aside">
           <router-link to="/Adjust" class="aside-box-options">
-            <img class="logo" src="../assets/images/wpsLogo.png" />
+            <el-icon :color="textColor"><Crop /></el-icon>
             <span>Adjust</span>
           </router-link>
           <router-link to="/Text" class="aside-box-options">
-            <img class="logo" src="../assets/images/wpsLogo.png" />
+            <el-icon :color="textColor"><Edit /></el-icon>
             <span>Text</span>
           </router-link>
         </el-aside>

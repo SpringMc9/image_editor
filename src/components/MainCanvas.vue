@@ -35,7 +35,6 @@ export default {
     const handleDrop = (event) => {
       event.preventDefault();
       const file = event.dataTransfer.files[0];
-
       if (file && file.type.startsWith("image/")) {
         readFile(file);
       } else {
@@ -47,6 +46,7 @@ export default {
       reader.onload = () => {
         store.commit('setUploadedImage', reader.result);
       };
+      store.commit('setUploadedFile', file)
       reader.readAsDataURL(file);
     };
 
@@ -69,6 +69,7 @@ export default {
           const content = event.target.result;
           store.commit('setUploadedImage', content);
         };
+        store.commit('setUploadedFile', selectedFile)
         reader.readAsDataURL(selectedFile);
         state.fileSelected = true;
       }
