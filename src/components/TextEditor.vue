@@ -22,20 +22,43 @@ export default {
       imageObject: null,
     });
 
+    // 加载画布
     const loadCanvas = () => {
       if (store.state.imageData && !state.imageObject) {
         const image = new Image();
         image.src = store.state.imageData;
         image.onload = () => {
           state.imageObject = new fabric.Image(image, {
-            left: 0,
-            top: 0,
             selectable: false,
           });
           state.canvas.add(state.imageObject);
+          updateImageScale();
         };
       }
     };
+
+    // 使图片自适应
+    const updateImageScale = () => {
+      if (state.imageObject) {
+        const canvasWidth = state.canvas.width;
+        const imageWidth = state.imageObject.width;
+        const canvasHeight = state.canvas.height;
+        const imageHeight = state.imageObject.height;
+        const widthRatio = canvasWidth / imageWidth;
+        const heightRatio = canvasHeight / imageHeight;
+        const scaleFactor = Math.min(widthRatio, heightRatio);
+
+        state.imageObject.set({
+          scaleX: scaleFactor,
+          scaleY: scaleFactor,
+          left: (canvasWidth - imageWidth * scaleFactor) / 2,
+          top: (canvasHeight - imageHeight * scaleFactor) / 2,
+        });
+        state.canvas.renderAll();
+      }
+    };
+
+    // 添加文字
     const addText = () => {
       if (state.imageObject) {
         const text = new fabric.IText("在这里添加文字", {
@@ -52,26 +75,22 @@ export default {
       }
     };
 
+    // 自适应画布大小
     const updateCanvasSize = () => {
-      const canvasElement = document.getElementById('canvas');
       const divElement = document.querySelector(".area");
-      canvasElement.width = divElement.clientWidth;
-      canvasElement.height = divElement.clientHeight;
+      state.canvas.setWidth(divElement.clientWidth);
+      state.canvas.setHeight(divElement.clientHeight);
+      updateImageScale();
     };
 
     onMounted(() => {
-      const divElement = document.querySelector(".area");
-      state.canvas = new fabric.Canvas("canvas", {
-        // width: divElement.clientWidth, // 画布宽度
-        // height: divElement.clientHeight, // 画布高度度
-      });
-      window.addEventListener('resize', updateCanvasSize);
-      updateCanvasSize()
+      state.canvas = new fabric.Canvas("canvas");
+      updateCanvasSize();
       loadCanvas();
+      window.addEventListener("resize", updateCanvasSize);
     });
-
-     onBeforeUnmount(() => {
-      window.removeEventListener('resize', updateCanvasSize);
+    onBeforeUnmount(() => {
+      window.removeEventListener("resize", updateCanvasSize);
     });
 
     return {
@@ -108,9 +127,5 @@ export default {
     margin-top: 22px;
     position: relative;
   }
-
-  canvas {
-        display: block;
-      }
 }
 </style>
