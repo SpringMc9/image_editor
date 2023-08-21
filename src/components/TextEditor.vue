@@ -2,7 +2,6 @@
   <div class="area">
     <canvas id="canvas" v-if="store.state.imageData" class="image"></canvas>
     <p v-else>请上传图片</p>
-    <!-- <button @click="addText">添加文字</button> -->
   </div>
 </template>
 
@@ -55,8 +54,8 @@ export default {
     const updateCanvasSize = () => {
       const canvasElement = document.getElementById('canvas');
       const divElement = document.querySelector(".area");
-      canvasElement.width = divElement.clientWidth;
-      canvasElement.height = divElement.clientHeight;
+      // canvasElement.width = divElement.clientWidth;
+      // canvasElement.height = divElement.clientHeight;
     };
 
     onMounted(() => {

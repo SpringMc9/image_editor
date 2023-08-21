@@ -1,70 +1,73 @@
 <template>
-  <div>
-    <vue-cropper
-      overflow-hidden
-      ref="cropper"
-      :src="src"
-      :containerStyle="containerStyle"
-      preview=".preview"
-      :minContainerHeight="300"
-      background
-      :ready="onReady"
-      :cropmove="touch"
-      :zoom="touch"
-    />
-
-    <div class="flex">
-      <el-button-group>
-        <el-button @click.prevent="zoom(0.2)">
-          <el-icon :color="textColor"><Plus /></el-icon>
-        </el-button>
-        <el-button @click.prevent="zoom(-0.2)">
-          <el-icon :color="textColor"><Minus /></el-icon>
-        </el-button>
-        <el-button @click.prevent="move(-10, 0)">
-          <el-icon :color="textColor"><ArrowLeft /></el-icon>
-        </el-button>
-        <el-button @click.prevent="move(10, 0)">
-          <el-icon :color="textColor"><ArrowRight /></el-icon>
-        </el-button>
-        <el-button @click.prevent="move(0, -10)">
-          <el-icon :color="textColor"><ArrowUp /></el-icon>
-        </el-button>
-        <el-button @click.prevent="move(0, 10)">
-          <el-icon :color="textColor"><ArrowDown /></el-icon>
-        </el-button>
-        <el-button
-          @click.prevent="flipX($event)"
-          class="flipX"
+  <div class="adjust">
+    <div v-if="isShowImg">
+      <vue-cropper
+        overflow-hidden
+        ref="cropper"
+        :src="store.state.imageData"
+        :containerStyle="containerStyle"
+        preview=".preview"
+        style="background-image: none"
+        :minContainerHeight="300"
+        :ready="onReady"
+        :cropmove="touch"
+        :zoom="touch"
+      />
+      <div class="flip">
+        <el-button-group>
+          <el-button @click.prevent="zoom(0.2)">
+            <el-icon :color="textColor"><Plus /></el-icon>
+          </el-button>
+          <el-button @click.prevent="zoom(-0.2)">
+            <el-icon :color="textColor"><Minus /></el-icon>
+          </el-button>
+          <el-button @click.prevent="move(-10, 0)">
+            <el-icon :color="textColor"><ArrowLeft /></el-icon>
+          </el-button>
+          <el-button @click.prevent="move(10, 0)">
+            <el-icon :color="textColor"><ArrowRight /></el-icon>
+          </el-button>
+          <el-button @click.prevent="move(0, -10)">
+            <el-icon :color="textColor"><ArrowUp /></el-icon>
+          </el-button>
+          <el-button @click.prevent="move(0, 10)">
+            <el-icon :color="textColor"><ArrowDown /></el-icon>
+          </el-button>
+          <el-button
+            @click.prevent="flipX($event)"
+            class="flipX"
+          >
+            flipX
+          </el-button>
+          <el-button
+            @click.prevent="flipY($event)"
+          >
+            flipY
+          </el-button>
+          <el-button type="info" @click.prevent="reset">
+            <el-icon :color="textColor"><Crop /></el-icon>
+          </el-button>
+        </el-button-group>
+      </div>
+      <div class="btn">
+        <el-button 
+          style="margin-left: 20px" 
+          type="info" 
+          @click="reset"
         >
-          flipX
+          重 置
         </el-button>
-        <el-button
-          @click.prevent="flipY($event)"
+        <el-button 
+          type="primary" 
+          :loading="submitting" 
+          @click="onConfirm"
         >
-          flipY
+          确 定
         </el-button>
-        <el-button type="info" @click.prevent="reset">
-          <el-icon :color="textColor"><Crop /></el-icon>
-        </el-button>
-      </el-button-group>
+      </div>
     </div>
-
-    <div class="btn">
-      <el-button 
-        style="margin-left: 20px" 
-        type="info" 
-        @click="reset"
-       >
-        重 置
-      </el-button>
-      <el-button 
-        type="primary" 
-        :loading="submitting" 
-        @click="onConfirm"
-      >
-        确 定
-      </el-button>
+    <div v-else class="uploadImg">
+      <MainCanvas></MainCanvas>
     </div>
   </div>
 </template>
@@ -72,12 +75,12 @@
 <script>
 import "cropperjs/dist/cropper.css";
 import VueCropper from "vue-cropperjs";
-import { file2Base64, aspectRatioToText, sizeToText, KB, MB } from "@/utils/adjustUtils";
+import { file2Base64, aspectRatioToText, sizeToText, MB } from "@/utils/adjustUtils";
 import { onBeforeMount, onMounted, onUpdated } from "@vue/runtime-core";
-import { throttle } from "lodash-es";
 import { reactive, toRefs, ref } from "@vue/reactivity";
 import { watchEffect , nextTick  } from "vue"
 import { useStore } from "vuex";
+import MainCanvas from '@/components/MainCanvas.vue'
 
 export default {
   props: {
@@ -91,6 +94,7 @@ export default {
   },
   components: {
     VueCropper,
+    MainCanvas
   },
   setup(props, context) {
     const store = useStore();
@@ -101,7 +105,8 @@ export default {
       loading: true,
       aspectRatioMismatched: false,
       submitting: false,
-      src: "",
+      // src: "",
+      isShowImg: false,
       sizeText: "",
       isLargeResolution: false,
       canvas: {},
@@ -284,6 +289,9 @@ export default {
     onUpdated(() => { });
 
     watchEffect (()=>{
+      if(store.state.imageData) {
+        state.isShowImg = true
+      }
       const file = (n) => {
         if (n) {
           if (aspectRatioValue()) {
@@ -301,7 +309,6 @@ export default {
                 width >= state.LARGE_RESOLUTION || height >= state.LARGE_RESOLUTION;
             };
             image.src = base64;
-            state.src = base64;
             cropper.value.replace(base64); // replace 后触发 onReady
           });
         } else {
@@ -335,17 +342,24 @@ export default {
 </script>
 
 <style lang="css" scoped>
+.adjust {
+  width: 100%;
+  height: auto;
+}
+.flip {
+    padding-left: 35%;
+    margin-top: 27px;
+  }
+  .btn {
+    padding-left: 45%;
+    margin-top: 13px;
+  }
+  .uploadImg {
+    width: 100%;
+    height: 630px;
+  }
 
-.flex {
-  padding-left: 35%;
-  margin-top: 40px;
-  margin-bottom: 15px;
-}
-.btn {
-  padding-left: 45%;
-  margin-top: 20px;
-  margin-bottom: 15px;
-}
+
 ::v-deep .el-button-group {
   display: inline-block;
   vertical-align: middle;

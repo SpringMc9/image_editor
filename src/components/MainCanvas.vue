@@ -61,6 +61,7 @@ export default {
       fileInput.click();
       document.body.removeChild(fileInput);
     };
+    
     const handleFileChange = (event) => {
       const selectedFile = event.target.files[0];
       if (selectedFile) {
