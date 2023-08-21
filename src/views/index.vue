@@ -7,18 +7,17 @@
           <span>Image Editor</span>
         </div>
         <div class="imageUpload">
-          <el-button type="primary" round>打开本地图片</el-button>
-          <el-button type="primary" round>保存图片</el-button>
+          <el-button type="primary" round @click="openLocalImg">打开本地图片</el-button>
         </div>
       </el-header>
       <el-container class="aside-main">
         <el-aside class="aside">
           <router-link to="/Adjust" class="aside-box-options">
-            <el-icon :color="textColor"><Crop /></el-icon>
+            <el-icon :color="textColor" class="icon-large"><Crop /></el-icon>
             <span>Adjust</span>
           </router-link>
           <router-link to="/Text" class="aside-box-options">
-            <el-icon :color="textColor"><Edit /></el-icon>
+            <el-icon :color="textColor" class="icon-large"><Edit /></el-icon>
             <span>Text</span>
           </router-link>
         </el-aside>
@@ -44,18 +43,42 @@ export default {
     const router = useRouter();
     const store = useStore();
     const state = reactive({});
-
+    
     // 挂载前
     onBeforeMount(() => {});
     // 挂载后
     onMounted(() => {});
     // 更新后
     onUpdated(() => {});
+    const openLocalImg = () => {
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.style.display = "none";
+      fileInput.addEventListener("change", handleFileChange);
+      document.body.appendChild(fileInput);
+      fileInput.click();
+      document.body.removeChild(fileInput);
+    }
+
+    const handleFileChange = (event) => {
+      const selectedFile = event.target.files[0];
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const content = event.target.result;
+          store.commit('setUploadedImage', content);
+        };
+        store.commit('setUploadedFile', selectedFile)
+        reader.readAsDataURL(selectedFile);
+      }
+    };
 
     return {
       ...toRefs(state),
       store,
       router,
+      openLocalImg,
+      handleFileChange
     };
   },
 };
@@ -82,17 +105,16 @@ export default {
 
     .header {
       height: 50px;
-      // border: 2px solid #bde9f0;
       border-radius: 10px;
       display: flex;
+      justify-content: space-between;
       flex-wrap: wrap;
       align-content: center;
-      // background-color: #bde9f0;
 
       .header-left {
-        width: 80%;
         display: flex;
         align-items: center;
+        font-size: 25px;
         .logo {
           width: 50px;
         }
@@ -101,7 +123,7 @@ export default {
         }
       }
       .imageUpload{
-        flex: 1;
+        // flex: 1;
         display: flex;
         align-items: center;
       }
@@ -133,9 +155,8 @@ export default {
           border-radius: 10px;
           text-decoration: none;
           background-color:#f3f6f7;
-
-          .logo {
-            width: 55%;
+          .icon-large {
+            font-size: 32px;
           }
         }
 
@@ -146,7 +167,8 @@ export default {
 
       .main {
         flex: 1;
-        border: 1px solid rgb(231, 21, 175);
+        border: 2px solid rgb(24, 23, 24);
+        border-radius: 5px;
         float: right;
       }
     }
