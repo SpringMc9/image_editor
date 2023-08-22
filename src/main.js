@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 // element-plus插件
 import ElementPlus from "element-plus";
+import V3ColorPicker from "v3-color-picker";
 import "element-plus/dist/index.css";
 
 // 全局icon
@@ -16,6 +17,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
 }
 
+app.use(V3ColorPicker);
 app.use(ElementPlus);
 app.use(store);
 app.use(router);
