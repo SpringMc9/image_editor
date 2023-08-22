@@ -6,15 +6,18 @@
           <img class="logo" src="../assets/images/wpsLogo.png" />
           <span>Image Editor</span>
         </div>
+        <div class="imageUpload">
+          <el-button type="primary" round @click="openLocalImg">打开本地图片</el-button>
+        </div>
       </el-header>
       <el-container class="aside-main">
         <el-aside class="aside">
           <router-link to="/Adjust" class="aside-box-options">
-            <img class="logo" src="../assets/images/wpsLogo.png" />
+            <el-icon :color="textColor" class="icon-large"><Crop /></el-icon>
             <span>Adjust</span>
           </router-link>
           <router-link to="/Text" class="aside-box-options">
-            <img class="logo" src="../assets/images/wpsLogo.png" />
+            <el-icon :color="textColor" class="icon-large"><Edit /></el-icon>
             <span>Text</span>
           </router-link>
         </el-aside>
@@ -40,18 +43,42 @@ export default {
     const router = useRouter();
     const store = useStore();
     const state = reactive({});
-
+    
     // 挂载前
     onBeforeMount(() => {});
     // 挂载后
     onMounted(() => {});
     // 更新后
     onUpdated(() => {});
+    const openLocalImg = () => {
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.style.display = "none";
+      fileInput.addEventListener("change", handleFileChange);
+      document.body.appendChild(fileInput);
+      fileInput.click();
+      document.body.removeChild(fileInput);
+    }
+
+    const handleFileChange = (event) => {
+      const selectedFile = event.target.files[0];
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const content = event.target.result;
+          store.commit('setUploadedImage', content);
+        };
+        store.commit('setUploadedFile', selectedFile)
+        reader.readAsDataURL(selectedFile);
+      }
+    };
 
     return {
       ...toRefs(state),
       store,
       router,
+      openLocalImg,
+      handleFileChange
     };
   },
 };
@@ -78,29 +105,34 @@ export default {
 
     .header {
       height: 50px;
-      border: 1px solid blue;
+      border-radius: 10px;
       display: flex;
+      justify-content: space-between;
       flex-wrap: wrap;
       align-content: center;
 
       .header-left {
-        width: 13%;
-
+        display: flex;
+        align-items: center;
+        font-size: 25px;
         .logo {
-          width: 26%;
+          width: 50px;
         }
-
         .span {
+          text-decoration: none;
         }
+      }
+      .imageUpload{
+        // flex: 1;
+        display: flex;
+        align-items: center;
       }
     }
 
     .aside-main {
       width: 100%;
       height: 90vh;
-      /* 设置高度为视口高度 */
       display: flex;
-      /* 使用 Flex 布局 */
       flex-direction: initial;
       position: relative;
 
@@ -120,24 +152,23 @@ export default {
           justify-content: center;
           align-items: center;
           margin-top: 15px;
-          background-color: #f8fafb;
           border-radius: 10px;
-
-          .logo {
-            width: 55%;
+          text-decoration: none;
+          background-color:#f3f6f7;
+          .icon-large {
+            font-size: 32px;
           }
         }
 
         .aside-box-options:hover {
-          background-color: #ecf3ff;
-          /* 鼠标悬停时的背景色 */
+          background-color: #ECF3FF;
         }
       }
 
       .main {
         flex: 1;
-        /* 使用 Flex 自适应布局，使 Main 部分占据剩余空间 */
-        border: 1px solid rgb(231, 21, 175);
+        border: 2px solid rgb(24, 23, 24);
+        border-radius: 5px;
         float: right;
       }
     }
