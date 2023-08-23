@@ -11,7 +11,7 @@
       v-model:value="color"
       @change="changeColor"
     ></v3-color-picker>
-    <select class="selectOption" v-model="font">
+    <select class="selectOption" v-model="font" @change="changeFamily">
       <option
         v-for="option in intlfonts"
         :value="option.value"
@@ -52,6 +52,7 @@ export default {
     const state = reactive({
       imageObject: null,
       showNav: false,
+      intlfonts: intlfonts,
       font: intlfonts[0].value,
       color: "rgba(0,0,0,1)",
       bold: "normal",
@@ -112,7 +113,7 @@ export default {
           left: canvas.width / 2,
           top: canvas.height / 2,
           fill: "rgba(0,0,0,1)",
-          fontFamily: "Arial",
+          fontFamily: state.font,
           fontSize: 40,
           fontWeight: "normal",
           fontStyle: "normal",
@@ -211,6 +212,15 @@ export default {
       }
     };
 
+    // 改变文字种类
+    const changeFamily = () => {
+      if (text) {
+        text.set({
+          fontFamily: state.font,
+        });
+      }
+    };
+
     onMounted(() => {
       canvas = new fabric.Canvas("canvas");
       updateCanvasSize();
@@ -230,6 +240,7 @@ export default {
       changeSize,
       changeBold,
       changeItalic,
+      changeFamily,
     };
   },
 };
