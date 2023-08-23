@@ -12,7 +12,7 @@ export default createStore({
     },
     setUploadedFile(state, file) {
       state.uploadedFile = file;
-    },
+    }
   },
   actions: {},
   modules: {},

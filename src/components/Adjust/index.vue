@@ -171,22 +171,22 @@ export default {
       if (mustCrop()) {
         state.submitting = true;
         cropper.value.getCroppedCanvas({
-            maxWidth: state.maxResolution,
-            maxHeight: state.maxResolution,
-          })
-          .toBlob(
-            (blob) => {
-              const sizeDiffText = getSizeDiffText(
-                props.file.size,
-                blob.size
-              );
-              context.emit("confirm", blob);
-              state.submitting = false;
-            },
-            props.file.type,
-            // 质量
-            state.quality
-          );
+          maxWidth: state.maxResolution,
+          maxHeight: state.maxResolution,
+        })
+        .toBlob(
+          (blob) => {
+            const sizeDiffText = getSizeDiffText(
+              props.file.size,
+              blob.size
+            );
+            context.emit("confirm", blob);
+            state.submitting = false;
+          },
+          props.file.type,
+          // 质量
+          state.quality
+        );
       } else {
         context.emit("confirm");
       }

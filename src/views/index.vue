@@ -8,6 +8,7 @@
         </div>
         <div class="imageUpload">
           <el-button type="primary" round @click="openLocalImg">打开本地图片</el-button>
+          <el-button type="primary" round @click="storeImg">保存图片</el-button>
         </div>
       </el-header>
       <el-container class="aside-main">
@@ -73,12 +74,21 @@ export default {
       }
     };
 
+    const storeImg = () => {
+      const imgStore = store.state.imageData;
+      const link = document.createElement('a');
+      link.href = imgStore;
+      link.download = 'image.png'; // 可以根据需要指定文件名
+      link.click();
+    }
+
     return {
       ...toRefs(state),
       store,
       router,
       openLocalImg,
-      handleFileChange
+      handleFileChange,
+      storeImg
     };
   },
 };

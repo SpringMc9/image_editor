@@ -12,7 +12,7 @@
           <img :src="imgSrc" class="image" />
         </div>
         <div class="handleBut">
-          <el-button type="primary" @click="storeImg">保存</el-button>
+          <el-button type="primary" @click="storeImg">裁剪</el-button>
           <el-button type="primary" @click="closeImg">取消</el-button>
         </div>
       </div>
@@ -51,6 +51,7 @@ export default {
 
     // 确定裁减
     const onCropperConfirm = (blob) => {
+      console.log(blob);
       // 裁剪了
       if (blob) {
         // 将Blob文件转换成File格式
@@ -91,11 +92,6 @@ export default {
         store.commit('setUploadedFile', state.cropper.file)
       };
       reader.readAsDataURL(state.cropper.file);
-      const imgStore = store.state.imageData;
-      const link = document.createElement('a');
-      link.href = imgStore;
-      link.download = 'image.png'; // 可以根据需要指定文件名
-      link.click();
       closeImg()
     }
 

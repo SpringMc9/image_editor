@@ -82,7 +82,7 @@ export default {
       const divElement = document.querySelector(".area");
       canvas.setWidth(divElement.clientWidth);
       canvas.setHeight(divElement.clientHeight);
-      updateImageScale();
+      updateImageScale(); 
     };
 
     // 使图片自适应
@@ -174,6 +174,7 @@ export default {
         text.set({
           fill: state.color,
         });
+        canvas.renderAll();
       }
     };
 
@@ -183,6 +184,7 @@ export default {
         text.set({
           fontSize: state.size,
         });
+        canvas.renderAll();
       }
     };
 
@@ -197,6 +199,7 @@ export default {
         text.set({
           fontWeight: state.bold,
         });
+        canvas.renderAll();
       }
     };
     const changeItalic = () => {
@@ -209,6 +212,7 @@ export default {
         text.set({
           fontStyle: state.italic,
         });
+        canvas.renderAll();
       }
     };
 
@@ -218,6 +222,28 @@ export default {
         text.set({
           fontFamily: state.font,
         });
+        canvas.renderAll();
+      }
+    };
+
+    // 暂存图片
+    const saveCanvasImage = () => {
+      if (canvas) {
+        const mergedCanvas = document.createElement("canvas");
+        mergedCanvas.width = canvas.width;
+        mergedCanvas.height = canvas.height;
+        const context = mergedCanvas.getContext("2d");
+        context.drawImage(canvas.lowerCanvasEl, 0, 0);
+        const dataURL = mergedCanvas.toDataURL();
+        store.commit('setUploadedImage', dataURL);
+        fetch(dataURL)
+          .then(response => response.blob())
+          .then(blob => {
+            const file = new File([blob], store.state.uploadedFile.name, {
+              type: store.state.uploadedFile.type, // 设置文件类型
+            });
+            store.commit('setUploadedFile', file)
+          });
       }
     };
 
@@ -229,8 +255,10 @@ export default {
       window.addEventListener("resize", updateCanvasSize);
     });
     onBeforeUnmount(() => {
+      saveCanvasImage()
       window.removeEventListener("resize", updateCanvasSize);
     });
+
 
     return {
       ...toRefs(state),
@@ -241,6 +269,7 @@ export default {
       changeBold,
       changeItalic,
       changeFamily,
+      saveCanvasImage
     };
   },
 };
