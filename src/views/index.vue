@@ -13,11 +13,11 @@
       <el-container class="aside-main">
         <el-aside class="aside">
           <router-link to="/Adjust" class="aside-box-options">
-            <el-icon :color="textColor" class="icon-large"><Crop /></el-icon>
+            <el-icon class="icon-large"><Crop /></el-icon>
             <span>Adjust</span>
           </router-link>
           <router-link to="/Text" class="aside-box-options">
-            <el-icon :color="textColor" class="icon-large"><Edit /></el-icon>
+            <el-icon class="icon-large"><Edit /></el-icon>
             <span>Text</span>
           </router-link>
         </el-aside>
@@ -123,7 +123,6 @@ export default {
         }
       }
       .imageUpload{
-        // flex: 1;
         display: flex;
         align-items: center;
       }
@@ -157,6 +156,9 @@ export default {
           background-color:#f3f6f7;
           .icon-large {
             font-size: 32px;
+          }
+          span {
+            font-size: 18px;
           }
         }
 

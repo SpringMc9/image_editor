@@ -22,7 +22,7 @@
 
 <script>
 import { onBeforeMount, onMounted, onUpdated } from "@vue/runtime-core";
-import { reactive, ref, toRefs } from "@vue/reactivity";
+import { reactive, toRefs } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import AdjustImg from "@/components/Adjust/index.vue"

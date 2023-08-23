@@ -16,22 +16,22 @@
       <div class="flip">
         <el-button-group>
           <el-button @click.prevent="zoom(0.2)">
-            <el-icon :color="textColor"><Plus /></el-icon>
+            <el-icon><Plus /></el-icon>
           </el-button>
           <el-button @click.prevent="zoom(-0.2)">
-            <el-icon :color="textColor"><Minus /></el-icon>
+            <el-icon><Minus /></el-icon>
           </el-button>
           <el-button @click.prevent="move(-10, 0)">
-            <el-icon :color="textColor"><ArrowLeft /></el-icon>
+            <el-icon><ArrowLeft /></el-icon>
           </el-button>
           <el-button @click.prevent="move(10, 0)">
-            <el-icon :color="textColor"><ArrowRight /></el-icon>
+            <el-icon><ArrowRight /></el-icon>
           </el-button>
           <el-button @click.prevent="move(0, -10)">
-            <el-icon :color="textColor"><ArrowUp /></el-icon>
+            <el-icon><ArrowUp /></el-icon>
           </el-button>
           <el-button @click.prevent="move(0, 10)">
-            <el-icon :color="textColor"><ArrowDown /></el-icon>
+            <el-icon><ArrowDown /></el-icon>
           </el-button>
           <el-button
             @click.prevent="flipX($event)"
@@ -45,7 +45,7 @@
             flipY
           </el-button>
           <el-button type="info" @click.prevent="reset">
-            <el-icon :color="textColor"><Crop /></el-icon>
+            <el-icon><Crop /></el-icon>
           </el-button>
         </el-button-group>
       </div>
@@ -67,7 +67,12 @@
       </div>
     </div>
     <div v-else class="uploadImg">
-      <MainCanvas></MainCanvas>
+      <div>
+        <p>请先上传需要处理的图片!</p>
+      </div> 
+      <div class="guideImg">
+        <img src="../../assets/images/guide_2.png" alt="">
+      </div>
     </div>
   </div>
 </template>
@@ -84,10 +89,6 @@ import MainCanvas from '@/components/MainCanvas.vue'
 
 export default {
   props: {
-    show: {
-      type: Boolean,
-      required: true,
-    },
     file: File,
     aspectRatio: [Array, String],
     aspectRatioDeviation: Number,
@@ -105,7 +106,6 @@ export default {
       loading: true,
       aspectRatioMismatched: false,
       submitting: false,
-      // src: "",
       isShowImg: false,
       sizeText: "",
       isLargeResolution: false,
@@ -124,11 +124,11 @@ export default {
     const aspectRatioText = () => {
       return aspectRatioToText(aspectRatioValue());
     }
-    // 是否必须裁减
+    
     const mustCrop = () => {
       return state.aspectRatioMismatched || state.isTouched;
     }
-    // 图片的比例值
+    
     const aspectRatioValue = () => {
       if (props.aspectRatio) {
         if (typeof props.aspectRatio === "string") {
@@ -149,7 +149,7 @@ export default {
       }
       return textA + textB;
     }
-    // 检查图片真实比例是否为1:1,aspectRatioDeviation:0.1(误差不超过0.1)
+    
     const checkAspectRatio = (file) => {
       return new Promise((resolve) => {
         const fileReader = new FileReader();
@@ -164,7 +164,6 @@ export default {
           };
           image.src = e.target.result;
         };
-        // 将file文件转换成base64
         fileReader.readAsDataURL(file);
       });
     }
@@ -172,7 +171,6 @@ export default {
       if (mustCrop()) {
         state.submitting = true;
         cropper.value.getCroppedCanvas({
-            // 限制画布大小，限制生成的图片体积
             maxWidth: state.maxResolution,
             maxHeight: state.maxResolution,
           })
@@ -185,8 +183,6 @@ export default {
               context.emit("confirm", blob);
               state.submitting = false;
             },
-            // 如果旋转角度不为直角，则图片一定会出现空白区域，空白区域默认透明，使用 png 格式
-            //this.rotateDegree % 90 === 0 ? this.file.type : 'image/png',
             props.file.type,
             // 质量
             state.quality
@@ -195,7 +191,7 @@ export default {
         context.emit("confirm");
       }
     }
-    // 改变了图片，需要裁减图片
+    
     const touch = () => {
       state.isTouched = true;
     }
@@ -288,6 +284,7 @@ export default {
     // 更新后
     onUpdated(() => { });
 
+   // 图片监听
     watchEffect (()=>{
       if(store.state.imageData) {
         state.isShowImg = true
@@ -309,7 +306,7 @@ export default {
                 width >= state.LARGE_RESOLUTION || height >= state.LARGE_RESOLUTION;
             };
             image.src = base64;
-            cropper.value.replace(base64); // replace 后触发 onReady
+            cropper.value.replace(base64); 
           });
         } else {
           Object.assign(state, reactive());
@@ -347,18 +344,30 @@ export default {
   height: auto;
 }
 .flip {
-    padding-left: 35%;
-    margin-top: 27px;
-  }
-  .btn {
-    padding-left: 45%;
-    margin-top: 13px;
-  }
-  .uploadImg {
-    width: 100%;
-    height: 630px;
-  }
-
+  padding-left: 35%;
+  margin-top: 27px;
+}
+.btn {
+  padding-left: 45%;
+  margin-top: 13px;
+}
+.uploadImg {
+  width: 100%;
+  height: 625px;
+  font-size: 20px;
+  font-weight: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.guideImg {
+  position: absolute;
+  top: 3%;
+  right: 40px;
+}
+.guideImg img {
+  width: 75px;
+}
 
 ::v-deep .el-button-group {
   display: inline-block;
