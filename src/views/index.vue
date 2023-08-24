@@ -8,11 +8,11 @@
         </div>
         <div class="imageUpload">
           <el-button type="primary" round @click="openLocalImg">打开本地图片</el-button>
-          <el-button type="primary" round @click="storeImg">保存图片</el-button>
+          <el-button type="primary" round id="storeImage">保存图片</el-button>
         </div>
       </el-header>
       <el-container class="aside-main">
-        <el-aside class="aside">
+        <el-aside class="aside" v-if="store.state.imageData">
           <router-link to="/Adjust" class="aside-box-options">
             <el-icon class="icon-large"><Crop /></el-icon>
             <span>Adjust</span>
@@ -21,6 +21,16 @@
             <el-icon class="icon-large"><Edit /></el-icon>
             <span>Text</span>
           </router-link>
+        </el-aside>
+        <el-aside class="aside" v-else>
+          <div class="aside-box-options" @click="messageTip()">
+            <el-icon class="icon-large"><Crop /></el-icon>
+            <span>Adjust</span>
+          </div>
+          <div class="aside-box-options" @click="messageTip()">
+            <el-icon class="icon-large"><Edit /></el-icon>
+            <span>Text</span>
+          </div>
         </el-aside>
         <el-main class="main">
           <router-view> </router-view>
@@ -35,6 +45,8 @@ import { onBeforeMount, onMounted, onUpdated } from "@vue/runtime-core";
 import { reactive, toRefs } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { ElMessage } from 'element-plus';
+
 export default {
   name: "HomeView",
   props: [""],
@@ -43,7 +55,9 @@ export default {
     // 变量定义
     const router = useRouter();
     const store = useStore();
-    const state = reactive({});
+    const state = reactive({
+      
+    });
     
     // 挂载前
     onBeforeMount(() => {});
@@ -66,20 +80,24 @@ export default {
       if (selectedFile) {
         const reader = new FileReader();
         reader.onload = (event) => {
+          const img = new Image()
+          img.onload = () => {
+            const width = img.width; // 获取图像宽度
+            const height = img.height; // 获取图像高度
+            store.commit('setImageWidth', width)
+            store.commit('setImageHeight', height)
+          }
           const content = event.target.result;
           store.commit('setUploadedImage', content);
+          img.src = content;
         };
         store.commit('setUploadedFile', selectedFile)
         reader.readAsDataURL(selectedFile);
       }
     };
 
-    const storeImg = () => {
-      const imgStore = store.state.imageData;
-      const link = document.createElement('a');
-      link.href = imgStore;
-      link.download = 'image.png'; // 可以根据需要指定文件名
-      link.click();
+    const messageTip = () => {
+      ElMessage.warning('请上传图片');
     }
 
     return {
@@ -88,7 +106,7 @@ export default {
       router,
       openLocalImg,
       handleFileChange,
-      storeImg
+      messageTip
     };
   },
 };
@@ -184,6 +202,11 @@ export default {
         float: right;
       }
     }
+  }
+  .message {
+    width: 100px;
+    height: 80px;
+    color: black;
   }
 }
 </style>

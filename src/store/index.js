@@ -12,6 +12,12 @@ export default createStore({
     },
     setUploadedFile(state, file) {
       state.uploadedFile = file;
+    },
+    setImageWidth(state, width) {
+      state.imageWidth = width
+    },
+    setImageHeight(state, height) {
+      state.imageHeight = height
     }
   },
   actions: {},

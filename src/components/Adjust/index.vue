@@ -66,14 +66,6 @@
         </el-button>
       </div>
     </div>
-    <div v-else class="uploadImg">
-      <div>
-        <p>请先上传需要处理的图片!</p>
-      </div> 
-      <div class="guideImg">
-        <img src="../../assets/images/guide_2.png" alt="">
-      </div>
-    </div>
   </div>
 </template>
 
@@ -81,9 +73,10 @@
 import "cropperjs/dist/cropper.css";
 import VueCropper from "vue-cropperjs";
 import { file2Base64, aspectRatioToText, sizeToText, MB } from "@/utils/adjustUtils";
-import { onBeforeMount, onMounted, onUpdated } from "@vue/runtime-core";
+import { onBeforeMount, onMounted, onUpdated, onBeforeUnmount } from "@vue/runtime-core";
 import { reactive, toRefs, ref } from "@vue/reactivity";
 import { watchEffect , nextTick  } from "vue"
+import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import MainCanvas from '@/components/MainCanvas.vue'
 
@@ -98,6 +91,7 @@ export default {
     MainCanvas
   },
   setup(props, context) {
+    const router = useRouter();
     const store = useStore();
     const state = reactive({
       fileSelected: false,
@@ -118,6 +112,7 @@ export default {
       maxResolution: 2560,
       quality: 1,
       isTouched: false,
+      path: true
     });
     const cropper = ref(null)
 
@@ -170,23 +165,27 @@ export default {
     const onConfirm = () => {
       if (mustCrop()) {
         state.submitting = true;
-        cropper.value.getCroppedCanvas({
-          maxWidth: state.maxResolution,
-          maxHeight: state.maxResolution,
-        })
-        .toBlob(
-          (blob) => {
-            const sizeDiffText = getSizeDiffText(
-              props.file.size,
-              blob.size
-            );
-            context.emit("confirm", blob);
-            state.submitting = false;
-          },
-          props.file.type,
-          // 质量
-          state.quality
-        );
+        if(cropper.value) {
+          cropper.value.getCroppedCanvas({
+            maxWidth: state.maxResolution,
+            maxHeight: state.maxResolution,
+          })
+          .toBlob(
+            (blob) => {
+              const sizeDiffText = getSizeDiffText(
+                props.file.size,
+                blob.size
+              );
+              context.emit("confirm", blob);
+              state.submitting = false;
+            },
+            props.file.type,
+            // 质量
+            state.quality
+          );
+        }else {
+          console.log("getCroppedCanvas为空");
+        }  
       } else {
         context.emit("confirm");
       }
@@ -280,9 +279,15 @@ export default {
     });
     // 挂载后
     onMounted(() => {
+      if (!store.state.imageData) {
+        router.push({ path: '/' });
+      }
     });
     // 更新后
     onUpdated(() => { });
+    onBeforeUnmount(() => {
+      state.path = false
+    });
 
    // 图片监听
     watchEffect (()=>{
@@ -314,6 +319,15 @@ export default {
       } 
       file(props.file);
     })
+
+    // 监听主页面的保存按钮
+    const mainButton = window.parent.document.getElementById('storeImage');
+    if(mainButton) {
+      mainButton.addEventListener('click', () => {
+        console.log("1");
+        onConfirm()
+      });
+    }
   
 
     return {
@@ -350,23 +364,6 @@ export default {
 .btn {
   padding-left: 45%;
   margin-top: 13px;
-}
-.uploadImg {
-  width: 100%;
-  height: 625px;
-  font-size: 20px;
-  font-weight: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.guideImg {
-  position: absolute;
-  top: 3%;
-  right: 40px;
-}
-.guideImg img {
-  width: 75px;
 }
 
 ::v-deep .el-button-group {

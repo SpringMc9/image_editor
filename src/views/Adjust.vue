@@ -12,7 +12,7 @@
           <img :src="imgSrc" class="image" />
         </div>
         <div class="handleBut">
-          <el-button type="primary" @click="storeImg">裁剪</el-button>
+          <el-button type="primary" @click="storeImg">是否保存</el-button>
           <el-button type="primary" @click="closeImg">取消</el-button>
         </div>
       </div>
@@ -51,7 +51,6 @@ export default {
 
     // 确定裁减
     const onCropperConfirm = (blob) => {
-      console.log(blob);
       // 裁剪了
       if (blob) {
         // 将Blob文件转换成File格式
@@ -76,22 +75,13 @@ export default {
       }
     }
 
-    const onCropperClosed = () => {
-      const uploadInner = document.querySelector('#element-upload .upload-inner');
-      uploadInner.focus();
-    }
-    const onCropperOpen = () => {
-      const uploadInner = document.querySelector('#element-upload .upload-inner');
-      uploadInner.blur();
-    }
-
     const storeImg = () => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        store.commit('setUploadedImage', state.imgSrc)
-        store.commit('setUploadedFile', state.cropper.file)
-      };
-      reader.readAsDataURL(state.cropper.file);
+      store.commit('setUploadedImage', state.imgSrc)
+      store.commit('setUploadedFile', state.cropper.file)
+      const link = document.createElement('a');
+      link.href = store.state.imageData;
+      link.download = 'image1.png';
+      link.click();
       closeImg()
     }
 
@@ -99,10 +89,8 @@ export default {
       state.isShow = false
     }
 
-
     // 挂载前
     onBeforeMount(() => {
-      // readFile()
     });
     // 挂载后
     onMounted(() => {
@@ -116,8 +104,6 @@ export default {
       store,
       router,
       onCropperConfirm,
-      onCropperClosed,
-      onCropperOpen,
       storeImg,
       closeImg
     }
