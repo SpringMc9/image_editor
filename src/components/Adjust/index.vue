@@ -6,20 +6,19 @@
         ref="cropper"
         :src="store.state.imageData"
         :containerStyle="containerStyle"
-        preview=".preview"
-        style="background-image: none"
         :minContainerHeight="300"
         :ready="onReady"
         :cropmove="touch"
         :zoom="touch"
+        @cropmove="onCropMove"
       />
       <div class="flip">
         <el-button-group>
           <el-button @click.prevent="zoom(0.2)">
-            <el-icon><Plus /></el-icon>
+            <el-icon><ZoomIn /></el-icon>
           </el-button>
           <el-button @click.prevent="zoom(-0.2)">
-            <el-icon><Minus /></el-icon>
+            <el-icon><ZoomOut /></el-icon>
           </el-button>
           <el-button @click.prevent="move(-10, 0)">
             <el-icon><ArrowLeft /></el-icon>
@@ -37,12 +36,12 @@
             @click.prevent="flipX($event)"
             class="flipX"
           >
-            flipX
+            <el-icon><Switch /></el-icon>
           </el-button>
           <el-button
             @click.prevent="flipY($event)"
           >
-            flipY
+            <el-icon><Sort /></el-icon>
           </el-button>
           <el-button type="info" @click.prevent="reset">
             <el-icon><Crop /></el-icon>
@@ -112,18 +111,32 @@ export default {
       maxResolution: 2560,
       quality: 1,
       isTouched: false,
-      path: true
+      path: true,
+      dynamicWidth: 0, // 用于存储动态计算的宽度
+      dynamicHeight: 0, // 用于存储动态计算的高度
     });
     const cropper = ref(null)
 
+    const onCropMove = (eventData) => {
+      // 在裁剪移动时，动态计算宽高比
+      const cropper = cropper.value;
+      const currentWidth = cropper.cropper.getCropBoxData().width;
+      const currentHeight = cropper.cropper.getCropBoxData().height;
+      state.dynamicWidth = currentWidth;
+      state.dynamicHeight = currentHeight;
+    }
+
+    // 根据当前 aspectRatioValue 计算得到的宽高比文本描述
     const aspectRatioText = () => {
       return aspectRatioToText(aspectRatioValue());
     }
     
+    // 判断是否需要进行裁剪，如果宽高比不匹配或者已进行过裁剪操作，则返回 true
     const mustCrop = () => {
       return state.aspectRatioMismatched || state.isTouched;
     }
     
+    // 根据传入的 props.aspectRatio 获取宽高比的值。如果 props.aspectRatio 是字符串类型，则根据 "/" 分割获取宽度和高度，计算并返回宽高比
     const aspectRatioValue = () => {
       if (props.aspectRatio) {
         if (typeof props.aspectRatio === "string") {
@@ -132,6 +145,7 @@ export default {
         }
       }
     }
+    // 根据编辑前后的文件大小差异，返回描述文本。根据差值的正负情况，生成不同格式的文本
     const getSizeDiffText = (before, after) => {
       const diff = after - before;
       let textA = `原图体积 ${sizeToText(before)}，编辑后 ${sizeToText(after)}`,
@@ -180,7 +194,6 @@ export default {
               state.submitting = false;
             },
             props.file.type,
-            // 质量
             state.quality
           );
         }else {
@@ -197,14 +210,12 @@ export default {
     // 设置裁减的比列为1:1
     const onReady = () => {
       const { width, height, left, top } = cropper.value.getCanvasData();
-      //this.canvas = { width, height, left, top }
       if (typeof aspectRatioValue() === "number") {
         cropper.value.setAspectRatio(aspectRatioValue());
 
         nextTick(() => {
           // 默认裁剪框在图片之内（避免裁剪出白边），也可以放大以完全框住图片（避免遗漏信息）
           const originalRatio = width / height;
-          //this.cropBox = this.$refs.cropper.getCropBoxData()
           if (aspectRatioValue() > originalRatio) {
             cropper.value.setCropBoxData({ width, left });
             const {
@@ -214,7 +225,7 @@ export default {
             const {
               width: cropBoxWidth,
               height: cropBoxHeight,
-            } = cropper.value.getCropBoxData(); // 不能提前拿
+            } = cropper.value.getCropBoxData();
             cropper.value.setCropBoxData({
               top: (containerHeight - cropBoxHeight) / 2,
             });
@@ -235,7 +246,6 @@ export default {
           state.loading = false;
         });
       } else {
-        //this.cropBox = { ...this.canvas }
         cropper.value.setCropBoxData({ width, height, left, top });
         state.loading = false;
       }
@@ -346,7 +356,8 @@ export default {
       flipY,
       move,
       reset,
-      zoom
+      zoom,
+      onCropMove
     }
   } 
 }

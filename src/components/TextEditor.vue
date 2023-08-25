@@ -1,7 +1,6 @@
 <template>
   <div class="area">
-    <canvas id="canvas" v-if="store.state.imageData" class="image"></canvas>
-    
+    <canvas id="canvas" class="image"></canvas>
   </div>
   <div v-if="showNav" class="navigation">
     <el-button class="text-btn" @click="addText" type="primary">
@@ -69,7 +68,7 @@ export default {
 
     // 加载画布与图片
     const loadCanvas = () => {
-      if (store.state.imageData) {
+      if (store.state.imageData && !state.imageObject) {
         const image = new Image();
         image.src = store.state.imageData;
         image.onload = () => {
@@ -87,7 +86,7 @@ export default {
       const divElement = document.querySelector(".area");
       canvas.setWidth(divElement.clientWidth);
       canvas.setHeight(divElement.clientHeight);
-      updateImageScale(); 
+      // updateImageScale(); 
     };
 
     // 使图片自适应
@@ -107,7 +106,7 @@ export default {
           left: (canvasWidth - imageWidth * scaleFactor) / 2,
           top: (canvasHeight - imageHeight * scaleFactor) / 2,
         });
-        canvas.renderAll();
+        canvas.renderAll()
       }
     };
 
@@ -132,7 +131,6 @@ export default {
           cornerStyle: "circle",
           cornerDashArray: [10, 2],
         });
-
         const deleteIcon = new fabric.Text("×", {
           left: text.left + text.width,
           top: text.top,
@@ -142,22 +140,18 @@ export default {
           selectable: false,
           opacity: 0,
         });
-        deleteIcon.on("mousedown", () => {
-          canvas.remove(text);
-          canvas.remove(deleteIcon);
-        });
         text.on("moving", () => {
           const scalingFactor = text.scaleX;
           deleteIcon.set({
             left: text.left + text.width * scalingFactor,
-            top: text.top,
+            top: text.top
           });
         });
         text.on("scaling", (event) => {
           const scalingFactor = text.scaleX;
           deleteIcon.set({
             left: text.left + text.width * scalingFactor,
-            top: text.top,
+            top: text.top
           });
         });
         text.on("selected", () => {
@@ -165,6 +159,10 @@ export default {
         });
         text.on("deselected", () => {
           deleteIcon.set({ opacity: 0 });
+        });
+        deleteIcon.on("mousedown", () => {
+          canvas.remove(text);
+          canvas.remove(deleteIcon);
         });
         canvas.add(text);
         canvas.add(deleteIcon);
@@ -290,9 +288,16 @@ export default {
     });
     watch(() => store.state.imageData,(newValue) => {
       if(newValue) {
-        canvas = new fabric.Canvas("canvas");
-        updateCanvasSize();
-        loadCanvas();
+        const image = new Image();
+        image.src = store.state.imageData;
+        canvas.clear()
+        image.onload = () => {
+          state.imageObject = new fabric.Image(image, {
+            selectable: false,
+          });
+          canvas.add(state.imageObject);
+          updateImageScale();
+        };
       }      
     });
     

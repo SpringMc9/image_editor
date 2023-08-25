@@ -80,16 +80,8 @@ export default {
       if (selectedFile) {
         const reader = new FileReader();
         reader.onload = (event) => {
-          const img = new Image()
-          img.onload = () => {
-            const width = img.width; // 获取图像宽度
-            const height = img.height; // 获取图像高度
-            store.commit('setImageWidth', width)
-            store.commit('setImageHeight', height)
-          }
           const content = event.target.result;
           store.commit('setUploadedImage', content);
-          img.src = content;
         };
         store.commit('setUploadedFile', selectedFile)
         reader.readAsDataURL(selectedFile);
